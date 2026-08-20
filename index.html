@@ -459,9 +459,12 @@
       body.append('photoType',  files.photo.type || 'application/octet-stream');
       body.append('photoData',  photoData);
 
-      const res  = await fetch(SCRIPT_URL, { method:'POST', body });
-      const out  = await res.json();
-      if(!out.ok) throw new Error(out.error || 'Server rejected the submission');
+      /* Sent in "no-cors" mode. Google Workspace accounts redirect /exec to
+         script.google.com/a/macros/<domain>/... and the browser refuses to let
+         this page READ the reply across that redirect. The request itself still
+         arrives and is processed normally — we just can't see the answer, so we
+         only send it once and never retry (a retry would duplicate the row). */
+      await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body });
 
       document.querySelector('.card').style.display = 'none';
       document.getElementById('done').style.display = '';
